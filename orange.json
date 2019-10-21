@@ -1,0 +1,14 @@
+{
+    "Records": [
+        {
+            "keywords": "orange",
+            "limit": "1000",
+            "color": "orange",
+            "print_urls": "true",
+            "size": ">6MP",
+            "print_size": "true",
+            "chromedriver": ".\\chromedriver.exe",
+            "save_source": "orange"
+        }
+    ]
+}

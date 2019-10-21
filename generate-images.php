@@ -1,47 +1,38 @@
 <?php
 
-$outputFolder = 'C:\Users\Christopher\Desktop\sandbox\downloads\images';
+$inputFolder  = "C:\Users\Christopher\Desktop\sandbox\downloads\orange-orange";
+$images = scandir($inputFolder);
+$images = array_filter($images, function ($var) { if (($var == ".") or ($var == "..")) return false; return true;} );
+printf("found %d images\n", sizeof($images));
+
+$outputFolder = $inputFolder.'-cropped';
 if (!file_exists($outputFolder)) { mkdir($outputFolder); }    
-$imageList = 'C:\Users\Christopher\Desktop\sandbox\downloads\bowling ball.download.txt.txt';
-// $imageList = 'C:\Users\Christopher\Desktop\sandbox\downloads\Fly Swatter.download.txt.txt';
-// $imageList = 'C:\Users\Christopher\Desktop\sandbox\downloads\banana.download.txt.txt';
-$lines = file($imageList, FILE_IGNORE_NEW_LINES);
 
-$newImages = 'C:\Users\Christopher\Desktop\sandbox\downloads\bowling ball.parse.txt';
-// $newImages = 'C:\Users\Christopher\Desktop\sandbox\downloads\Fly Swatter.parse.txt';
-// $newImages = 'C:\Users\Christopher\Desktop\sandbox\downloads\banana.parse.txt';
-$f = fopen($newImages, "w");
+foreach($images as $filename) {
 
-$index = 0;
-foreach($lines as $line) {
+    echo "filename: ".$filename."\n";
 
-    $filename = explode("\t", $line)[0];
-    echo $filename."\n";
+    $im1 = imagecreatefromjpeg($inputFolder."\\".$filename);
+    if (!$im1) { echo "im1 error!\n"; continue; }
 
-    $im1 = imagecreatefromjpeg($filename);
-    if ($im1) {
-        $size = min(imagesx($im1), imagesy($im1));    
-        $im2 = imagecrop($im1, ['x' => 0, 'y' => 0, 'width' => $size, 'height' => $size ]);
+    $size = min(imagesx($im1), imagesy($im1));    
+    $x = calc_x($im1);
+    $y = calc_y($im1);
+    $width = min(imagesx($im1), imagesy($im1));    
+    $height = min(imagesx($im1), imagesy($im1));   
+    $im2 = imagecrop($im1, ['x' => $x, 'y' => $y, 'width' => $width, 'height' => $height ]);
 
-        $name = explode("/", $filename)[2];
-        $name = substr($name, strpos($name, ".") + 1);
+    imagejpeg($im2, $outputFolder."\\".$filename);
+    imagedestroy($im2);
+    imagedestroy($im1);
+}
+printf("done!\n");
 
-        $dest = $outputFolder."\\".substr($name, 0, 1);
-        if (!file_exists($dest)) { mkdir($dest); }    
-        $dest = $dest."\\".substr($name, 1, 1);
-        if (!file_exists($dest)) { mkdir($dest); }    
-
-        $qualified = $dest."\\".$name;    
-        echo $qualified."\n";
-        $tmp = substr($name, 0, 1)."/".substr($name, 1, 1)."/".$name;
-        fwrite($f, $tmp."\n");
-
-        imagejpeg($im2, $qualified);
-        imagedestroy($im2);
-        imagedestroy($im1);
-    } else {
-        echo "im1 error!\n";
-    }
-    $index = $index + 1;
-    //if ($index == 2) exit();
+function calc_x($im1) {
+    if (imagesx($im1) > imagesy($im1)) { return (imagesx($im1) - imagesy($im1)) / 2; }
+    return 0;
+}
+function calc_y($im1) {
+    if (imagesy($im1) > imagesx($im1)) { return (imagesy($im1) - imagesx($im1)) / 2; }
+    return 0;
 }

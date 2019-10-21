@@ -1,46 +1,56 @@
 <?php
+
+//
+// usage: php ./generate-csv.php -k2 -nrock -v200
+//
+
+require('generate-permutations.php');
+require('generate-util.php');
+
+$myAdjectives = json_decode(file_get_contents("negative-advertising-adjectives.json"), true);
+$k = (int)getopt("k:")["k"][0];
+$productName = (string)getopt("n:")["n"];
+$numVariants = (int)getopt("v:")["v"];
+
+printf("name: %s variants: %d n: %s k: %s\n", $productName, number_format($numVariants), number_format((float)sizeof($myAdjectives)), (float)number_format($k));
+printComboStats($myAdjectives, $k);
+
+printf("calculating... ");
+$starttime = microtime(true);
+$combinations = createCombinations($myAdjectives, $k);
+$endtime = microtime(true);
+$timediff = $endtime - $starttime;
+printf("%s combinations in %s seconds\n", number_format(sizeof($combinations)), $timediff);
+
+shuffle($combinations);
+foreach($combinations as $adjs) { shuffle($adjs); }
+
+$storeProduct = (object)json_decode(file_get_contents("product.json"), true);
+$addProducts = array();
+for($i=0;$i<$numVariants; $i++) { 
+
+    $sku = "";
+    $name = "";    
+    foreach($combinations[$i] as $adj) { 
+        if ($sku == "") { $sku = $myAdjectives[$adj]; } else { $sku = $sku."-".$myAdjectives[$adj]; } 
+        if ($name == "") { $name = $myAdjectives[$adj]; } else { $name = $name." ".$myAdjectives[$adj]; } 
+    }        
+    $sku = $sku."-".$productName;
+    $name = $name." ".$productName;
+
+    $qty = 100;
+    $price = 1.0;
+
+    $newProduct = clone $storeProduct;
+    $newProduct->sku = $sku;
+    $newProduct->name = $name;
+    $newProduct->created_at = "10/4/19, 3:22 AM";
+    $newProduct->updated_at = "10/4/19, 3:22 AM";
+    $newProduct->qty = $qty;
+    $newProduct->price = $price;
     
-$qualifier = 'Apple';
-$nameset = [ 'Moist', 'Chewy', 'Juicy', 'Healthy', 'Treat', 'Organic', 'Unsweetened', 'Crunchy', 'Vegan', 'Special', 'Excelsior', 'Spicy' ];
-$size = 2;
-
-MakeProducts($qualifier, $nameset, $size);
-
-function MakeProducts($qualifier, $nameset, $size) {
-
-    require('generate-permutations.php');
-    $combinations = createCombinations($nameset, $size);
-    shuffle($combinations);
-    foreach($combinations as $combo) { shuffle($combo); }
-
-    require('generate-util.php');
-    $storeProduct = openFile();
-
-    $addProducts = array();
-    foreach($combinations as $combo) {
-
-        $sku = "";
-        $name = "";
-        foreach($combo as $element) {
-            if ($name != "") { $name = $name." "; }
-            $name = $name.$nameset[$element];
-            $sku = $sku.strtolower($nameset[$element]);
-        }
-        $sku = strtolower($qualifier)."-".$sku;
-        $name .= " ".$qualifier;
-
-        $qty = 100;
-
-        $newProduct = clone $storeProduct;
-        $newProduct->sku = $sku;
-        $newProduct->name = $name;
-        $newProduct->created_at = "10/4/19, 3:22 AM";
-        $newProduct->updated_at = "10/4/19, 3:22 AM";
-        $newProduct->qty = $qty;
-        
-        //printf("sku: %s name: %s\n", $sku, $name);
-        array_push($addProducts, $newProduct);
-    }    
-
-    saveFile($addProducts);
+    array_push($addProducts, $newProduct);
 }
+
+saveFile($addProducts, "C:\Users\Christopher\Downloads\catalog_product - samplefile - out.csv");
+printf("%d products ready\n", sizeof($addProducts));

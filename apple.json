@@ -1,0 +1,14 @@
+{
+    "Records": [
+        {
+            "keywords": "apple",
+            "limit": "1000",
+            "color": "red",
+            "print_urls": "true",
+            "size": ">6MP",
+            "print_size": "true",
+            "chromedriver": ".\\chromedriver.exe",
+            "save_source": "apple"
+        }
+    ]
+}

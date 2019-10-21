@@ -1,0 +1,3 @@
+
+Parse error: syntax error, unexpected ';', expecting ',' or ')' in C:\Users\Christopher\Desktop\sandbox\generate-csv.php on line 34
+

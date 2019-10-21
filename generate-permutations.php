@@ -3,20 +3,24 @@
 $combinations = null;    
 $data = null;
 
+function printComboStats($elements, $k) {
+    $n = sizeof($elements); 
+    $num_permutations = pow($n, $k);
+    $num_permutations_norepeat = gmp_fact($n)/gmp_fact($n - $k);
+    $num_combinations = gmp_fact($n)/(gmp_fact($k)*gmp_fact($n - $k));
+    printf("set n: %d subset k: %d combos: %s permute: %s unique: %s\n", $n, $k, number_format((float)$num_combinations), number_format((float)$num_permutations), number_format((float)$num_permutations_norepeat));
+}
+
 function createCombinations($elements, $k) {
     $n = sizeof($elements); 
     $num_permutations = pow($n, $k);
     $num_permutations_norepeat = gmp_fact($n)/gmp_fact($n - $k);
     $num_combinations = gmp_fact($n)/(gmp_fact($k)*gmp_fact($n - $k));
-    echo "n: [".$n."] k: [".$k."] num_permutations: [".$num_permutations."] num_permutations_norepeat: [".$num_permutations_norepeat."] num_combinations: [".$num_combinations."]\n";
-
     global $combinations;
     global $data;
     $combinations = array();
     $data = array();
     combinationUtil($elements, $data, 0, $n - 1, 0, $k);
-    shuffle($combinations);
-    printf("%d combinations calculated\n", sizeof($combinations));
     return $combinations;
 }
 

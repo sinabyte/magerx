@@ -2,36 +2,26 @@
 
 $indexToKey = array();
 
-    //     //$imageList = 'C:\Users\Christopher\Desktop\sandbox\downloads\bowling ball.parse.txt';
-    //     //$lines = file($imageList, FILE_IGNORE_NEW_LINES);
-    //     //shuffle($lines);
-    //     //$maxfiles = sizeof($lines);
-    //     //echo $maxfiles." files available\n";
-    
-function saveFile($addProducts) {
-    global $indexToKey;
-    $outputFilename = "C:\Users\Christopher\Downloads\catalog_product - samplefile - out.csv";
-    $outputFile = fopen($outputFilename, 'a+');
+function saveFile($addProducts, $outputFilename) {
+    global $indexToKey;    
+    $outputFile = fopen($outputFilename, 'w');
     fputs($outputFile, arrayToCsv($indexToKey, ',', '"', false, false)."\n");
-    exit();
     foreach($addProducts as $product) {
         $product = (array)$product;
         fputs($outputFile, arrayToCsv($product, ',', '"', false, false)."\n");
     }
     fclose($outputFile);    
 }
-function openFile() {
+function openFile(&$newProducts, $inputFilename) {
 
-    global $indexToKey;
-    $inputFilename = 'C:\Users\Christopher\Downloads\export_catalog_product_20191004_143005.csv';
-    printf("opening file %s\n", $inputFilename);
+    global $indexToKey;    
     $csv = file_get_contents($inputFilename);
     $array1 = explode("\n", $csv);    
     $array2 = array_map("str_getcsv", $array1);
     $indexToKey = array();
     $storeProduct = null;
     
-    $count = 0;
+    $newProducts = array();
     foreach($array2 as $importProduct) {
         $index = 0;
         if ($storeProduct == null) {
@@ -48,11 +38,11 @@ function openFile() {
                 $newProduct->$key = $value;
                 $index = $index + 1;
             }
-            $newProduct = (array)$newProduct;
-            $count++;
+            array_push($newProducts, $newProduct);
         }
     }    
-    printf("found %d records\n", $count);
+    //printf("found %d products in '%s'\n", sizeof($newProducts), $inputFilename);
+
     $storeProduct->store_view_code = "";
     $storeProduct->attribute_set_code = "Default";
     $storeProduct->product_type = "simple";
