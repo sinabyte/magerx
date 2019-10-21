@@ -7,6 +7,8 @@
 require('generate-permutations.php');
 require('generate-util.php');
 
+openFile($addProducts, 'C:\Users\Christopher\Downloads\export_catalog_product_20191004_110456.csv');
+
 $myAdjectives = json_decode(file_get_contents("negative-advertising-adjectives.json"), true);
 $k = (int)getopt("k:")["k"][0];
 $productName = (string)getopt("n:")["n"];
