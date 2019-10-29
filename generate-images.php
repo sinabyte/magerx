@@ -1,6 +1,6 @@
 <?php
 
-$inputFolder  = "C:\Users\Christopher\Desktop\sandbox\downloads\orange-orange";
+$inputFolder  = "C:\Users\Christopher\Desktop\sandbox\downloads\orange oranges citrus fruit-orange";
 $images = scandir($inputFolder);
 $images = array_filter($images, function ($var) { if (($var == ".") or ($var == "..")) return false; return true;} );
 printf("found %d images\n", sizeof($images));
@@ -10,8 +10,7 @@ if (!file_exists($outputFolder)) { mkdir($outputFolder); }
 
 foreach($images as $filename) {
 
-    echo "filename: ".$filename."\n";
-
+    if ((strpos(strtolower($filename), '.jpeg') === false) && (strpos(strtolower($filename), '.jpg') === false)) { echo "not a jpeg\n"; continue; }
     $im1 = imagecreatefromjpeg($inputFolder."\\".$filename);
     if (!$im1) { echo "im1 error!\n"; continue; }
 
@@ -20,11 +19,20 @@ foreach($images as $filename) {
     $y = calc_y($im1);
     $width = min(imagesx($im1), imagesy($im1));    
     $height = min(imagesx($im1), imagesy($im1));   
-    $im2 = imagecrop($im1, ['x' => $x, 'y' => $y, 'width' => $width, 'height' => $height ]);
 
-    imagejpeg($im2, $outputFolder."\\".$filename);
-    imagedestroy($im2);
-    imagedestroy($im1);
+    $newfilename = urldecode($filename);
+    $newfilename = preg_replace('/[^A-Za-z0-9._-]/','', $newfilename);
+    $newfilename = $outputFolder.'\\'.$newfilename;
+
+    echo "orig: [".$filename."] new: [".$newfilename."]\n";
+
+    try {
+        $im2 = imagecrop($im1, ['x' => $x, 'y' => $y, 'width' => $width, 'height' => $height ]);
+        imagejpeg($im2, $newfilename);
+        imagedestroy($im2);
+    } finally  {
+        imagedestroy($im1);
+    }
 }
 printf("done!\n");
 

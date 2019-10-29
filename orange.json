@@ -1,9 +1,9 @@
 {
     "Records": [
         {
-            "keywords": "orange",
+            "keywords": "orange oranges citrus fruit",
             "limit": "1000",
-            "color": "orange",
+            "color": "orange",            
             "print_urls": "true",
             "size": ">6MP",
             "print_size": "true",
