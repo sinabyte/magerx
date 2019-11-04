@@ -2,13 +2,12 @@
     "Records": [
         {
             "keywords": "orange oranges citrus fruit",
-            "limit": "1000",
+            "limit": "400",
             "color": "orange",            
             "print_urls": "true",
-            "size": ">6MP",
+            "size": ">2MP",
             "print_size": "true",
-            "chromedriver": ".\\chromedriver.exe",
-            "save_source": "orange"
+            "chromedriver": ".\\chromedriver.exe"
         }
     ]
 }
